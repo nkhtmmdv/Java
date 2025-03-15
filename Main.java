@@ -1,63 +1,77 @@
-import java.io.*;
 import java.util.*;
 
-interface PerformOperation {
-    boolean check(int a);
+class Student implements Comparable<Student> {
+    int id;
+    String name;
+    String surname;
+    double grade;
+    String gender;
+    Date birthdate;
+
+    public Student(int id, String name, String surname, double grade, String gender, Date birthdate) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.grade = grade;
+        this.gender = gender;
+        this.birthdate = birthdate;
+    }
+
+    @Override
+    public int compareTo(Student other) {
+        return Integer.compare(this.id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", grade=" + grade +
+                ", gender='" + gender + '\'' +
+                ", birthdate=" + birthdate +
+                '}';
+    }
 }
 
-class MyMath {
-    public static PerformOperation isOdd() {
-        return (n) -> n % 2 != 0;
-    }
-
-    public static PerformOperation isPrime() {
-        return (n) -> {
-            if (n < 2) return false;
-            for (int i = 2; i <= Math.sqrt(n); i++) {
-                if (n % i == 0) return false;
-            }
-            return true;
-        };
-    }
-
-    public static PerformOperation isPalindrome() {
-        return (n) -> {
-            String original = String.valueOf(n);
-            String reversed = new StringBuilder(original).reverse().toString();
-            return original.equals(reversed);
-        };
+class GradeComparator implements Comparator<Student> {
+    @Override
+    public int compare(Student s1, Student s2) {
+        int gradeCompare = Double.compare(s2.grade, s1.grade);
+        if (gradeCompare != 0) return gradeCompare;
+        int birthdateCompare = s1.birthdate.compareTo(s2.birthdate);
+        if (birthdateCompare != 0) return birthdateCompare;
+        return s1.gender.compareTo(s2.gender);
     }
 }
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        MyMath ob = new MyMath();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int T = Integer.parseInt(br.readLine());
-        while (T-- > 0) {
-            String[] inputs = br.readLine().split(" ");
-            int choice = Integer.parseInt(inputs[0]);
-            int num = Integer.parseInt(inputs[1]);
-            PerformOperation op;
-            boolean result;
+    public static void main(String[] args) {
+        List<Student> students = new ArrayList<>();
+        students.add(new Student(5, "John", "Doe", 88.0, "Male", new Date(102, 3, 10)));
+        students.add(new Student(2, "Emily", "Clark", 91.5, "Female", new Date(99, 6, 25)));
+        students.add(new Student(4, "Michael", "Johnson", 88.0, "Male", new Date(102, 3, 10)));
+        students.add(new Student(1, "Sophia", "Miller", 95.0, "Female", new Date(98, 11, 5)));
+        students.add(new Student(3, "Daniel", "Smith", 91.5, "Male", new Date(99, 6, 25)));
 
-            switch (choice) {
-                case 1:
-                    op = ob.isOdd();
-                    result = op.check(num);
-                    System.out.println(result ? "ODD" : "EVEN");
-                    break;
-                case 2:
-                    op = ob.isPrime();
-                    result = op.check(num);
-                    System.out.println(result ? "PRIME" : "COMPOSITE");
-                    break;
-                case 3:
-                    op = ob.isPalindrome();
-                    result = op.check(num);
-                    System.out.println(result ? "PALINDROME" : "NOT PALINDROME");
-                    break;
-            }
-        }
+        Collections.sort(students);
+        System.out.println("Sorted by ID:");
+        students.forEach(System.out::println);
+
+        students.sort(new GradeComparator());
+        System.out.println("\nSorted by Grade, Birthdate, and Gender:");
+        students.forEach(System.out::println);
+        
+        students.sort((s1, s2) -> {
+            int gradeCompare = Double.compare(s2.grade, s1.grade);
+            if (gradeCompare != 0) return gradeCompare;
+            int birthdateCompare = s1.birthdate.compareTo(s2.birthdate);
+            if (birthdateCompare != 0) return birthdateCompare;
+            return s1.gender.compareTo(s2.gender);
+        });
+
+        System.out.println("\nSorted using Lambda:");
+        students.forEach(System.out::println);
     }
 }
